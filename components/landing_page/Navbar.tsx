@@ -31,7 +31,7 @@ const Navbar = () => {
 				<div className="flex items-center justify-between">
 					<div className="flex items-center">
 						<Link href="/" className="flex items-center">
-							<Logo height={40} width={40} />
+							<Logo height={35} width={35} />
 						</Link>
 					</div>
 
@@ -57,10 +57,10 @@ const Navbar = () => {
 					</nav>
 
 					<div className="hidden md:flex items-center space-x-4">
-						<Button variant="ghost" className="text-aerial-white hover:text-aerial-red">
+						<Button variant="default" className="rounded-full">
 							<Link href="/sign-in">Log In</Link>
 						</Button>
-						<Button variant="secondary" className="bg-aerial-red hover:bg-aerial-red-light text-aerial-white">
+						<Button variant="outline" className="rounded-full">
 							<Link href="/sign-up">Sign Up</Link>
 						</Button>
 					</div>
@@ -72,11 +72,8 @@ const Navbar = () => {
 								<span className="sr-only">Toggle navigation menu</span>
 							</Button>
 						</SheetTrigger>
-						<SheetContent side="left" className="bg-aerial-blue text-aerial-white flex flex-col">
+						<SheetContent side="left" className="bg-aerial-darks-dark bg-opacity-50 text-aerial-white flex flex-col w-full">
 							<div className="flex-grow">
-								<div className="flex items-center justify-center mb-10 mt-6">
-									<Logo height={80} width={80} className="bg-aerial-red rounded-full p-3" />
-								</div>
 								<nav className="grid gap-8 text-lg font-light">
 									<Link href="/about" className="text-aerial-white hover:text-aerial-red transition-colors flex items-center gap-3">
 										<Info size={24} />

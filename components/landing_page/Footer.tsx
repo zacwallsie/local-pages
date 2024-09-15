@@ -4,120 +4,105 @@ import { Button } from "../ui/button"
 
 const MainFooter = () => {
 	return (
-		<footer className="bg-aerial-darks text-aerial-offwhite">
-			<div className="w-full bg-aerial-darks-dark">
-				<div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-16 py-12">
-					<div className="flex flex-col lg:flex-row justify-between items-center">
-						<div className="text-center lg:text-left mb-6 lg:mb-0">
-							<h3 className="text-2xl lg:text-3xl xl:text-4xl font-light">Ready to take your business to new heights?</h3>
-						</div>
-						<div className="flex items-center justify-center">
+		<footer className="bg-aerial-darks-dark border-t border-aerial-darks-light pt-20 pb-10">
+			<div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-16">
+				<div className="grid grid-cols-1 md:grid-cols-5 gap-10">
+					<div className="col-span-1 md:col-span-2">
+						<h2 className="text-2xl md:text-3xl text-aerial-offwhite mb-6">Starting with Local Pages is simple, fast, and free.</h2>
+						<div className="flex flex-col sm:flex-row gap-4">
+							<Button variant="default" size="lg" className="rounded-full bg-aerial-blue hover:bg-aerial-blue-dark text-aerial-white">
+								<Link href="/sign-up">Start for free</Link>
+							</Button>
 							<Button
 								variant="secondary"
-								className="bg-aerial-red hover:bg-aerial-red-light text-aerial-offwhite text-lg lg:text-xl xl:text-2xl py-3 px-6 lg:py-4 lg:px-8 xl:py-5 xl:px-10 transform transition-all duration-200"
+								size="lg"
+								className="rounded-full bg-aerial-darks-light hover:bg-aerial-darks text-aerial-offwhite"
 							>
-								<Link href="/signup">Create Your Business Profile</Link>
+								<Link href="/demo">Book a demo</Link>
 							</Button>
 						</div>
 					</div>
-				</div>
-			</div>
-			<div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-16 py-12">
-				<div className="grid grid-cols-2 md:grid-cols-12 gap-8 mb-12">
-					<div className="col-span-2 md:col-span-4 lg:col-span-3">
-						<h4 className="text-md lg:text-lg font-semibold mb-4 text-aerial-blue-light">Key Links</h4>
-						<ul className="space-y-4">
+
+					<div className="col-span-1">
+						<h3 className="text-aerial-slate-light uppercase mb-4">Products</h3>
+						<ul className="space-y-2">
 							<li>
-								<Link href="/about" className="text-xl lg:text-2xl xl:text-3xl hover:text-aerial-red-light transition-colors">
-									Our Company
+								<Link href="/features" className="text-aerial-offwhite hover:text-aerial-blue-light">
+									Features
 								</Link>
 							</li>
 							<li>
-								<Link href="/contact" className="text-xl lg:text-2xl xl:text-3xl hover:text-aerial-red-light transition-colors">
-									Contact Us
+								<Link href="/pricing" className="text-aerial-offwhite hover:text-aerial-blue-light">
+									Pricing
 								</Link>
 							</li>
 							<li>
-								<Link href="/careers" className="text-xl lg:text-2xl xl:text-3xl hover:text-aerial-red-light transition-colors">
-									Careers
+								<Link href="/integrations" className="text-aerial-offwhite hover:text-aerial-blue-light">
+									Integrations
 								</Link>
 							</li>
 						</ul>
 					</div>
-					<div className="col-span-1 md:col-span-4 lg:col-span-3">
-						<h4 className="text-md lg:text-lg font-semibold mb-4 text-aerial-blue-light">Resources</h4>
+
+					<div className="col-span-1">
+						<h3 className="text-aerial-slate-light uppercase mb-4">Resources</h3>
 						<ul className="space-y-2">
 							<li>
-								<Link href="/blog" className="text-lg xl:text-xl hover:text-aerial-red-light transition-colors">
+								<Link href="/blog" className="text-aerial-offwhite hover:text-aerial-blue-light">
 									Blog
 								</Link>
 							</li>
 							<li>
-								<Link href="/partners" className="text-lg xl:text-xl hover:text-aerial-red-light transition-colors">
-									Partners
-								</Link>
-							</li>
-							<li>
-								<Link href="/community" className="text-lg xl:text-xl hover:text-aerial-red-light transition-colors">
-									Community
-								</Link>
-							</li>
-							<li>
-								<Link href="/investors" className="text-lg xl:text-xl hover:text-aerial-red-light transition-colors">
-									Investors
-								</Link>
-							</li>
-						</ul>
-					</div>
-					<div className="col-span-1 md:col-span-4 lg:col-span-3">
-						<h4 className="text-md lg:text-lg font-semibold mb-4 text-aerial-blue-light">Support</h4>
-						<ul className="space-y-2">
-							<li>
-								<Link href="/faq" className="text-lg xl:text-xl hover:text-aerial-red-light transition-colors">
-									FAQ
-								</Link>
-							</li>
-							<li>
-								<Link href="/documentation" className="text-lg xl:text-xl hover:text-aerial-red-light transition-colors">
+								<Link href="/documentation" className="text-aerial-offwhite hover:text-aerial-blue-light">
 									Documentation
 								</Link>
 							</li>
 							<li>
-								<Link href="/training" className="text-lg xl:text-xl hover:text-aerial-red-light transition-colors">
-									Training & Tutorials
+								<Link href="/community" className="text-aerial-offwhite hover:text-aerial-blue-light">
+									Community
+								</Link>
+							</li>
+						</ul>
+					</div>
+
+					<div className="col-span-1">
+						<h3 className="text-aerial-slate-light uppercase mb-4">Company</h3>
+						<ul className="space-y-2">
+							<li>
+								<Link href="/about" className="text-aerial-offwhite hover:text-aerial-blue-light">
+									About
+								</Link>
+							</li>
+							<li>
+								<Link href="/careers" className="text-aerial-offwhite hover:text-aerial-blue-light">
+									Careers
+								</Link>
+							</li>
+							<li>
+								<Link href="/partners" className="text-aerial-offwhite hover:text-aerial-blue-light">
+									Partners
 								</Link>
 							</li>
 						</ul>
 					</div>
 				</div>
-				<div className="border-t border-aerial-darks-light pt-8">
-					<div className="flex flex-col md:flex-row justify-between items-center">
-						<div className="text-sm lg:text-base mb-4 md:mb-0">
-							<p>© {new Date().getFullYear()} Pelican Pages. All rights reserved.</p>
-						</div>
-						<ul className="flex flex-wrap justify-center space-x-4">
-							<li>
-								<Link href="/terms" className="text-sm lg:text-base hover:text-aerial-blue-light transition-colors">
-									Terms
-								</Link>
-							</li>
-							<li>
-								<Link href="/privacy" className="text-sm lg:text-base hover:text-aerial-blue-light transition-colors">
-									Privacy
-								</Link>
-							</li>
-							<li>
-								<Link href="/cookies" className="text-sm lg:text-base hover:text-aerial-blue-light transition-colors">
-									Cookies
-								</Link>
-							</li>
-							<li>
-								<Link href="/accessibility" className="text-sm lg:text-base hover:text-aerial-blue-light transition-colors">
-									Accessibility
-								</Link>
-							</li>
-						</ul>
+
+				<div className="mt-16 pt-8 border-t border-aerial-darks flex flex-col md:flex-row justify-between items-center">
+					<div className="mb-4 md:mb-0">
+						<img src="/local-pages-logo.svg" alt="Local Pages Logo" className="h-8" />
 					</div>
+					<div className="flex flex-wrap justify-center gap-6">
+						<Link href="/terms" className="text-aerial-slate hover:text-aerial-offwhite text-sm">
+							Terms of use
+						</Link>
+						<Link href="/privacy" className="text-aerial-slate hover:text-aerial-offwhite text-sm">
+							Privacy policy
+						</Link>
+						<Link href="/security" className="text-aerial-slate hover:text-aerial-offwhite text-sm">
+							Security
+						</Link>
+					</div>
+					<div className="text-aerial-slate text-sm mt-4 md:mt-0">© {new Date().getFullYear()} Local Pages</div>
 				</div>
 			</div>
 		</footer>

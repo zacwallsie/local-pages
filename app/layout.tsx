@@ -8,7 +8,7 @@ export const metadata = {
 	metadataBase: new URL(defaultUrl),
 	title: app.name,
 	description: app.description,
-	icon: "/pelican-pages-logo.svg",
+	icon: "/local-pages-logo.svg",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -17,8 +17,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			<head>
 				<title>{app.name}</title>
 				<meta name="description" content={app.description} />
-				<link rel="icon" href="/pelican-pages-logo.svg" />
-				<link rel="apple-touch-icon" href="/pelican-pages-logo.png" />
+				<link rel="icon" href="/local-pages-logo.svg" />
+				<link rel="apple-touch-icon" href="/local-pages-logo.png" />
 			</head>
 			<body>
 				{children}

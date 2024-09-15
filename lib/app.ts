@@ -1,10 +1,10 @@
-import PelicanPagesLogo from "../public/pelican-pages-logo.svg"
+import LocalPagesLogo from "../public/local-pages-logo.svg"
 
 const app = {
-	name: "Pelican Pages",
+	name: "Local Pages",
 	description: "Opening up your business to your local community.",
-	logoUrl: PelicanPagesLogo,
-	logoUrl_str: "../public/pelican-pages-logo.svg",
+	logoUrl: LocalPagesLogo,
+	logoUrl_str: "../public/local-pages-logo.svg",
 }
 
 export default app

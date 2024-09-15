@@ -10,7 +10,7 @@ interface LogoProps {
 const Logo: React.FC<LogoProps> = ({ className = "", width = 100, height = 100 }) => {
 	return (
 		<div className={className}>
-			<Image src="/pelican-pages-logo.svg" alt="Logo" width={width} height={height} />
+			<Image src="/local-pages-logo.svg" alt="Logo" width={width} height={height} className="transition-all hover:scale-110" />
 		</div>
 	)
 }

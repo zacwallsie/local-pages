@@ -11,7 +11,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 				<div className="mx-auto w-[400px] gap-6 my-40">
 					<div className="gap-2 mb-8">
 						<div className="flex items-center justify-center">
-							<div className="relative w-[280px] h-[280px]">
+							<div className="relative w-[260px] h-[260px]">
 								<div className="absolute inset-0 bg-aerial-red rounded-full"></div>
 								<div className="absolute inset-0 flex items-center justify-center">
 									<Image src={app.logoUrl} alt={app.name} width={200} height={200} quality={100} loading="lazy" />

@@ -6,7 +6,6 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 export default function NotFound() {
 	return (
 		<div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
-			<BackButton />
 			<Card className="w-full max-w-md">
 				<CardHeader>
 					<div className="mb-8">

@@ -51,11 +51,7 @@ export function SignInForm() {
 						description: result.error,
 					})
 				} else if (result && "success" in result) {
-					toast({
-						title: "Success",
-						description: "Signed in successfully.",
-					})
-					router.push("/app") // Adjust this to your app's post-login route
+					router.push("/app")
 				}
 			} catch (error) {
 				toast({
