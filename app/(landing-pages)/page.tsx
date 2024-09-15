@@ -7,9 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 
 const BusinessLandingPage = () => {
 	return (
-		<main className="flex flex-col min-h-screen bg-aerial-offwhite">
-			<Navbar />
-
+		<>
 			{/* Hero Section */}
 			<section className="w-full bg-gradient-to-r from-aerial-blue-light to-aerial-blue text-aerial-white py-24">
 				<div className="container mx-auto px-4">
@@ -96,9 +94,7 @@ const BusinessLandingPage = () => {
 					</Button>
 				</div>
 			</section>
-
-			<Footer />
-		</main>
+		</>
 	)
 }
 

@@ -8,7 +8,7 @@ interface ButtonWithStateProps extends React.ButtonHTMLAttributes<HTMLButtonElem
 	loadingText?: string
 }
 
-const ButtonWithState = (props: ButtonWithStateProps) => {
+export const ButtonWithState = (props: ButtonWithStateProps) => {
 	const { label, loading, loadingText, ...rest } = props
 
 	let CurrentButton: React.ReactNode
@@ -24,5 +24,3 @@ const ButtonWithState = (props: ButtonWithStateProps) => {
 	}
 	return CurrentButton
 }
-
-export default ButtonWithState

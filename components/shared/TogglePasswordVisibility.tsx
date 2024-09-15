@@ -7,12 +7,10 @@ interface TogglePasswordVisibilityProps {
 	handlePasswordVisibility: () => void
 }
 
-const TogglePasswordVisibility: React.FC<TogglePasswordVisibilityProps> = ({ isPasswordVisible, handlePasswordVisibility }) => {
+export const TogglePasswordVisibility: React.FC<TogglePasswordVisibilityProps> = ({ isPasswordVisible, handlePasswordVisibility }) => {
 	return (
 		<Button onClick={handlePasswordVisibility} className="bg-primary flex pointer items-center text-white" type="button">
 			{!isPasswordVisible ? <EyeIcon className="h-4 w-4" /> : <EyeSlashIcon className="h-4 w-4" />}
 		</Button>
 	)
 }
-
-export default TogglePasswordVisibility

@@ -1,5 +1,5 @@
-import HeaderAuth from "@/components/header-auth"
 import "@/styles/globals.css"
+import { Toaster } from "@/components/ui/toaster"
 import app from "@/lib/app"
 
 const defaultUrl = process.env.APP_URL ?? "http://localhost:3000"
@@ -20,7 +20,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				<link rel="icon" href="/pelican-pages-logo.svg" />
 				<link rel="apple-touch-icon" href="/pelican-pages-logo.png" />
 			</head>
-			<body>{children}</body>
+			<body>
+				{children}
+				<Toaster />
+			</body>
 		</html>
 	)
 }
