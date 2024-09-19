@@ -16,7 +16,7 @@ const config = {
 			colors: {
 				aerial: {
 					white: "#FFFFFF",
-					offwhite: "#F9F7F4",
+					offwhite: "#FBF7F5",
 					blue: {
 						lightest: "#E1EAF4",
 						light: "#B0C7DD",

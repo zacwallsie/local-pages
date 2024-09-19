@@ -129,7 +129,7 @@ const BusinessLandingPage = () => {
 						size="lg"
 						className="bg-aerial-red hover:bg-aerial-red-light text-aerial-white font-normal text-lg px-8 py-3 transition-colors"
 					>
-						Create Your Free Account
+						Create Your Free Company Account
 					</Button>
 				</div>
 			</section>

@@ -9,7 +9,7 @@ export default function NotFound() {
 			<Card className="w-full max-w-md">
 				<CardHeader>
 					<div className="mb-8">
-						<Image src="/404-illustration.svg" alt="404 Illustration" width={300} height={300} className="mx-auto" />
+						<Image src="/images/local-pages-mailbox.svg" alt="404 Illustration" width={300} height={300} className="mx-auto" />
 					</div>
 					<CardTitle className="text-4xl font-extrabold text-center">Oops! Page Not Found</CardTitle>
 					<CardDescription className="text-lg text-center">

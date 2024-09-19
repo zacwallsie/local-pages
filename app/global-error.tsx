@@ -11,7 +11,7 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
 				<Card className="w-full max-w-md">
 					<CardHeader>
 						<div className="mb-8">
-							<Image src="/500-illustration.svg" alt="500 Error Illustration" width={300} height={300} className="mx-auto" />
+							<Image src="/images/local-pages-mailbox.svg" alt="500 Error Illustration" width={300} height={300} className="mx-auto" />
 						</div>
 						<CardTitle className="text-4xl font-extrabold text-center">Oops! Something went wrong</CardTitle>
 						<CardDescription className="text-lg text-center mt-2">

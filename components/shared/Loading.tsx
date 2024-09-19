@@ -1,6 +1,6 @@
 import React from "react"
 
-const Loading = () => {
+export const Loading = () => {
 	return (
 		<div className="flex items-center justify-center h-screen">
 			<div role="status">
@@ -31,5 +31,3 @@ const Spinner = () => {
 		</svg>
 	)
 }
-
-export default Loading

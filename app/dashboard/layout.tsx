@@ -1,5 +1,5 @@
 import React from "react"
-import AppLayout from "@/components/app/AppLayout"
+import AppLayout from "@/components/dashboard/AppLayout"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (

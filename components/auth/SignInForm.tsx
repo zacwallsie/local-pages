@@ -5,7 +5,7 @@ import { useFormik } from "formik"
 import * as Yup from "yup"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { ButtonWithState } from "@/components/shared/ButtonWithState"
 import { TogglePasswordVisibility } from "@/components/shared/TogglePasswordVisibility"
 import { useToast } from "@/hooks/use-toast"
@@ -51,7 +51,7 @@ export function SignInForm() {
 						description: result.error,
 					})
 				} else if (result && "success" in result) {
-					router.push("/app")
+					router.push("/dashboard")
 				}
 			} catch (error) {
 				toast({

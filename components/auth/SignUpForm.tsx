@@ -83,7 +83,7 @@ export function SignUpForm() {
 					<form onSubmit={formik.handleSubmit}>
 						<div className="space-y-3">
 							<div className="space-y-1">
-								<Label htmlFor="email">Email</Label>
+								<Label htmlFor="email">Company Email</Label>
 								<Input
 									id="email"
 									name="email"
@@ -119,8 +119,11 @@ export function SignUpForm() {
 							</div>
 						</div>
 						<div className="mt-6 space-y-3 w-full">
+							<p className="text-sm text-gray-800">
+								Once you've made an account we'll run you through the steps on how to make your Company page.
+							</p>
 							<ButtonWithState
-								label="Create Account"
+								label="Create Company Account"
 								type="submit"
 								color="primary"
 								loading={formik.isSubmitting}
@@ -133,7 +136,7 @@ export function SignUpForm() {
 				</CardContent>
 			</Card>
 			<p className="text-center text-sm text-gray-600 mt-3">
-				Already have an account?&nbsp;
+				Already have a company account?&nbsp;
 				<Link href={`/sign-in`} className="font-medium text-primary hover:text-[color-mix(in_oklab,oklch(var(--p)),black_7%)]">
 					Sign in
 				</Link>

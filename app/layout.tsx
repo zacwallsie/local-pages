@@ -1,4 +1,5 @@
 import "@/styles/globals.css"
+import "leaflet/dist/leaflet.css"
 import { Toaster } from "@/components/ui/toaster"
 import app from "@/lib/app"
 

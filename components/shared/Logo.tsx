@@ -1,4 +1,3 @@
-import app from "@/lib/app"
 import Image from "next/image"
 
 interface LogoProps {
