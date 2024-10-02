@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+.leaflet-top {
+	top: 30px !important;
+}
+
+.leaflet-control-zoom {
+	margin-top: 30px !important;
+}
+
 @layer base {
 	:root {
 		--background: 0 0% 100%;

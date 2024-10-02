@@ -11,7 +11,7 @@ import { TogglePasswordVisibility } from "@/components/shared/TogglePasswordVisi
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { signInAction } from "@/lib/actions"
+import { signInAction } from "@/lib/supabase/actions"
 
 type SignInActionResult = { error: string } | { success: true } | undefined
 
@@ -51,7 +51,7 @@ export function SignInForm() {
 						description: result.error,
 					})
 				} else if (result && "success" in result) {
-					router.push("/dashboard")
+					router.push("/company")
 				}
 			} catch (error) {
 				toast({

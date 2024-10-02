@@ -6,13 +6,12 @@ import * as Yup from "yup"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { AgreeMessage } from "@/components/shared/AgreeMessage"
 import { ButtonWithState } from "@/components/shared/ButtonWithState"
 import { TogglePasswordVisibility } from "@/components/shared/TogglePasswordVisibility"
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { signUpAction } from "@/lib/actions"
+import { signUpAction } from "@/lib/supabase/actions"
 
 const SignupSchema = Yup.object().shape({
 	email: Yup.string().email("Invalid email").required("Email is required"),
@@ -130,7 +129,6 @@ export function SignUpForm() {
 								disabled={!formik.dirty || !formik.isValid || formik.isSubmitting}
 								className="w-full"
 							/>
-							<AgreeMessage text="create-account" />
 						</div>
 					</form>
 				</CardContent>

@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { ArrowUpCircle, Loader2, CheckCircle2, MapPin, Package } from "lucide-react"
-import { createCompanyAction } from "@/lib/actions"
+import { createCompanyAction } from "@/lib/supabase/actions"
 import { Steps, Step } from "./Steps"
 import { Separator } from "@/components/ui/separator"
 
@@ -48,6 +48,7 @@ export function CreateCompanyForm() {
 			logo: null as File | null,
 			website_url: "",
 			phone_number: "",
+			address: "",
 		},
 		validationSchema: CreateCompanySchema,
 		onSubmit: async (values, { setSubmitting }) => {
@@ -63,6 +64,9 @@ export function CreateCompanyForm() {
 				if (values.phone_number) {
 					formData.append("phone_number", values.phone_number)
 				}
+				if (values.address) {
+					formData.append("address", values.address)
+				}
 
 				if (values.logo instanceof File) {
 					const logoString = await new Promise<string>((resolve, reject) => {
@@ -76,7 +80,6 @@ export function CreateCompanyForm() {
 							}
 						}
 						reader.onerror = () => reject(new Error("Failed to read file"))
-						reader.readAsDataURL(values.logo)
 					})
 					formData.append("logo", logoString)
 				}
@@ -95,7 +98,7 @@ export function CreateCompanyForm() {
 						title: "Company Created",
 						description: "Your company has been created successfully",
 					})
-					router.push("/dashboard")
+					router.push("/company")
 				}
 			} catch (error: any) {
 				toast({
@@ -273,6 +276,25 @@ export function CreateCompanyForm() {
 										<p className="mt-1 text-sm text-aerial-red">{formik.errors.phone_number}</p>
 									)}
 								</div>
+							</div>
+
+							<div>
+								<Label htmlFor="address" className="text-sm font-medium text-aerial-slate-dark">
+									Address
+								</Label>
+								<Textarea
+									id="address"
+									name="address"
+									onChange={formik.handleChange}
+									onBlur={formik.handleBlur}
+									value={formik.values.address}
+									placeholder="Company Address"
+									className="mt-1 h-24 bg-aerial-white border-aerial-blue"
+								/>
+								<p className="mt-1 text-sm text-aerial-slate">Enter your company's physical address (if applicable).</p>
+								{formik.touched.address && formik.errors.address && (
+									<p className="mt-1 text-sm text-aerial-red">{formik.errors.address}</p>
+								)}
 							</div>
 						</div>
 

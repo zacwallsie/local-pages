@@ -1,5 +1,4 @@
 import Image from "next/image"
-import BackButton from "@/components/shared/BackButton"
 import HomeButton from "@/components/shared/HomeButton"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 

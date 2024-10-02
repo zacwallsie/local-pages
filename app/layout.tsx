@@ -2,14 +2,16 @@ import "@/styles/globals.css"
 import "leaflet/dist/leaflet.css"
 import { Toaster } from "@/components/ui/toaster"
 import app from "@/lib/app"
+import { SessionProvider } from "@/components/providers/SessionProvider"
+import { Metadata } from "next"
 
 const defaultUrl = process.env.APP_URL ?? "http://localhost:3000"
 
-export const metadata = {
+export const metadata: Metadata = {
 	metadataBase: new URL(defaultUrl),
 	title: app.name,
 	description: app.description,
-	icon: "/local-pages-logo.svg",
+	icons: "/local-pages-logo.svg",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -22,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				<link rel="apple-touch-icon" href="/local-pages-logo.png" />
 			</head>
 			<body>
-				{children}
+				<SessionProvider>{children}</SessionProvider>
 				<Toaster />
 			</body>
 		</html>

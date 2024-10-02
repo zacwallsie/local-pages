@@ -97,12 +97,12 @@ const Navbar = () => {
 							</div>
 							<div className="mt-auto mb-6 space-y-4">
 								<Button variant="default" className="w-full text-lg py-6 text-aerial-white hover:text-aerial-red">
-									<Link href="/login" className="flex items-center justify-center">
+									<Link href="/sign-in" className="flex items-center justify-center">
 										Log In
 									</Link>
 								</Button>
 								<Button variant="secondary" className="w-full text-lg py-6 bg-aerial-red hover:bg-aerial-red-light text-aerial-white">
-									<Link href="/signup" className="flex items-center justify-center">
+									<Link href="/sign-up" className="flex items-center justify-center">
 										Sign Up
 									</Link>
 								</Button>

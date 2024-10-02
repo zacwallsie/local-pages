@@ -18,7 +18,7 @@ const MainFooter = () => {
 								size="lg"
 								className="rounded-full bg-aerial-darks-light hover:bg-aerial-darks text-aerial-offwhite"
 							>
-								<Link href="/demo">Book a demo</Link>
+								<Link href="/">Book a demo</Link>
 							</Button>
 						</div>
 					</div>
@@ -27,17 +27,17 @@ const MainFooter = () => {
 						<h3 className="text-aerial-slate-light uppercase mb-4">Products</h3>
 						<ul className="space-y-2">
 							<li>
-								<Link href="/features" className="text-aerial-offwhite hover:text-aerial-blue-light">
+								<Link href="/" className="text-aerial-offwhite hover:text-aerial-blue-light">
 									Features
 								</Link>
 							</li>
 							<li>
-								<Link href="/pricing" className="text-aerial-offwhite hover:text-aerial-blue-light">
+								<Link href="/" className="text-aerial-offwhite hover:text-aerial-blue-light">
 									Pricing
 								</Link>
 							</li>
 							<li>
-								<Link href="/integrations" className="text-aerial-offwhite hover:text-aerial-blue-light">
+								<Link href="/" className="text-aerial-offwhite hover:text-aerial-blue-light">
 									Integrations
 								</Link>
 							</li>
@@ -48,17 +48,17 @@ const MainFooter = () => {
 						<h3 className="text-aerial-slate-light uppercase mb-4">Resources</h3>
 						<ul className="space-y-2">
 							<li>
-								<Link href="/blog" className="text-aerial-offwhite hover:text-aerial-blue-light">
+								<Link href="/" className="text-aerial-offwhite hover:text-aerial-blue-light">
 									Blog
 								</Link>
 							</li>
 							<li>
-								<Link href="/documentation" className="text-aerial-offwhite hover:text-aerial-blue-light">
+								<Link href="/" className="text-aerial-offwhite hover:text-aerial-blue-light">
 									Documentation
 								</Link>
 							</li>
 							<li>
-								<Link href="/community" className="text-aerial-offwhite hover:text-aerial-blue-light">
+								<Link href="/" className="text-aerial-offwhite hover:text-aerial-blue-light">
 									Community
 								</Link>
 							</li>
@@ -69,17 +69,17 @@ const MainFooter = () => {
 						<h3 className="text-aerial-slate-light uppercase mb-4">Company</h3>
 						<ul className="space-y-2">
 							<li>
-								<Link href="/about" className="text-aerial-offwhite hover:text-aerial-blue-light">
+								<Link href="/" className="text-aerial-offwhite hover:text-aerial-blue-light">
 									About
 								</Link>
 							</li>
 							<li>
-								<Link href="/careers" className="text-aerial-offwhite hover:text-aerial-blue-light">
+								<Link href="/" className="text-aerial-offwhite hover:text-aerial-blue-light">
 									Careers
 								</Link>
 							</li>
 							<li>
-								<Link href="/partners" className="text-aerial-offwhite hover:text-aerial-blue-light">
+								<Link href="/" className="text-aerial-offwhite hover:text-aerial-blue-light">
 									Partners
 								</Link>
 							</li>
@@ -92,13 +92,13 @@ const MainFooter = () => {
 						<img src="/local-pages-logo.svg" alt="Local Pages Logo" className="h-8" />
 					</div>
 					<div className="flex flex-wrap justify-center gap-6">
-						<Link href="/terms" className="text-aerial-slate hover:text-aerial-offwhite text-sm">
+						<Link href="/" className="text-aerial-slate hover:text-aerial-offwhite text-sm">
 							Terms of use
 						</Link>
-						<Link href="/privacy" className="text-aerial-slate hover:text-aerial-offwhite text-sm">
+						<Link href="/" className="text-aerial-slate hover:text-aerial-offwhite text-sm">
 							Privacy policy
 						</Link>
-						<Link href="/security" className="text-aerial-slate hover:text-aerial-offwhite text-sm">
+						<Link href="/" className="text-aerial-slate hover:text-aerial-offwhite text-sm">
 							Security
 						</Link>
 					</div>

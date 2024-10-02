@@ -1,16 +1,18 @@
+// lib/supabase/actions.ts
 "use server"
 
-import { createClient } from "@/utils/supabase/server"
+import { createServerSupabaseClient } from "@/lib/supabase/serverClient"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
-import { Company } from "@/types/company"
+import { Company } from "@/types/supabase"
 
 export type ActionResult = { success: true; message: string } | { error: string }
 
+// Authentication Actions
 export const signUpAction = async (formData: FormData): Promise<ActionResult> => {
 	const email = formData.get("email")?.toString()
 	const password = formData.get("password")?.toString()
-	const supabase = createClient()
+	const supabase = createServerSupabaseClient()
 	const origin = headers().get("origin")
 
 	if (!email || !password) {
@@ -26,7 +28,7 @@ export const signUpAction = async (formData: FormData): Promise<ActionResult> =>
 	})
 
 	if (error) {
-		console.error(error.code + " " + error.message)
+		console.error(`${error.code} ${error.message}`)
 		return { error: error.message }
 	} else {
 		return { success: true, message: "Thanks for signing up! Please check your email for a verification link." }
@@ -34,9 +36,13 @@ export const signUpAction = async (formData: FormData): Promise<ActionResult> =>
 }
 
 export const signInAction = async (formData: FormData): Promise<ActionResult> => {
-	const email = formData.get("email") as string
-	const password = formData.get("password") as string
-	const supabase = createClient()
+	const email = formData.get("email")?.toString()
+	const password = formData.get("password")?.toString()
+	const supabase = createServerSupabaseClient()
+
+	if (!email || !password) {
+		return { error: "Email and password are required" }
+	}
 
 	const { error } = await supabase.auth.signInWithPassword({
 		email,
@@ -52,7 +58,7 @@ export const signInAction = async (formData: FormData): Promise<ActionResult> =>
 
 export const forgotPasswordAction = async (formData: FormData): Promise<ActionResult> => {
 	const email = formData.get("email")?.toString()
-	const supabase = createClient()
+	const supabase = createServerSupabaseClient()
 	const origin = headers().get("origin")
 
 	if (!email) {
@@ -60,7 +66,7 @@ export const forgotPasswordAction = async (formData: FormData): Promise<ActionRe
 	}
 
 	const { error } = await supabase.auth.resetPasswordForEmail(email, {
-		redirectTo: `${origin}/auth/callback?redirect_to=/dashboard/reset-password`,
+		redirectTo: `${origin}/auth/callback?redirect_to=/company/reset-password`,
 	})
 
 	if (error) {
@@ -71,10 +77,10 @@ export const forgotPasswordAction = async (formData: FormData): Promise<ActionRe
 }
 
 export const resetPasswordAction = async (formData: FormData): Promise<ActionResult> => {
-	const supabase = createClient()
+	const supabase = createServerSupabaseClient()
 
-	const password = formData.get("password") as string
-	const confirmPassword = formData.get("confirmPassword") as string
+	const password = formData.get("password")?.toString()
+	const confirmPassword = formData.get("confirmPassword")?.toString()
 
 	if (!password || !confirmPassword) {
 		return { error: "Password and confirm password are required" }
@@ -96,13 +102,14 @@ export const resetPasswordAction = async (formData: FormData): Promise<ActionRes
 }
 
 export const signOutAction = async () => {
-	const supabase = createClient()
+	const supabase = createServerSupabaseClient()
 	await supabase.auth.signOut()
 	return redirect("/sign-in")
 }
 
+// Company Actions
 export const createCompanyAction = async (formData: FormData): Promise<ActionResult> => {
-	const supabase = createClient()
+	const supabase = createServerSupabaseClient()
 
 	// Get the authenticated user
 	const {
@@ -115,21 +122,22 @@ export const createCompanyAction = async (formData: FormData): Promise<ActionRes
 	}
 
 	// Check if the user already has a company
-	const { data: existingCompany } = await supabase.from("companies").select("*").eq("user_id", user.id).single()
+	const { data: existingCompany, error: companyError } = await supabase.from("companies").select("*").eq("user_id", user.id).single()
 
 	if (existingCompany) {
 		return { error: "User already has a company" }
 	}
 
 	// Extract all fields from the formData
-	const companyName = formData.get("company_name") as string
-	const description = formData.get("description") as string
-	const websiteUrl = formData.get("website_url") as string | null
-	const phoneNumber = formData.get("phone_number") as string | null
-	const logoString = formData.get("logo") as string | null
+	const companyName = formData.get("company_name")?.toString() || ""
+	const description = formData.get("description")?.toString() || ""
+	const websiteUrl = formData.get("website_url")?.toString() || null
+	const phoneNumber = formData.get("phone_number")?.toString() || null
+	const address = formData.get("address")?.toString() || null
+	const logoString = formData.get("logo")?.toString() || null
 
 	// Prepare the company data
-	const companyData: any = {
+	const companyData: Partial<Company> = {
 		user_id: user.id,
 		company_name: companyName,
 		description: description,
@@ -139,6 +147,7 @@ export const createCompanyAction = async (formData: FormData): Promise<ActionRes
 	// Add optional fields if they exist
 	if (websiteUrl) companyData.website_url = websiteUrl
 	if (phoneNumber) companyData.phone_number = phoneNumber
+	if (address) companyData.address = address
 
 	// Handle logo data
 	if (logoString) {
@@ -158,7 +167,7 @@ export const createCompanyAction = async (formData: FormData): Promise<ActionRes
 	}
 
 	// Insert the new company into the database
-	const { data: newCompany, error } = await supabase.from("companies").insert(companyData).select().single()
+	const { error } = await supabase.from("companies").insert(companyData).select().single()
 
 	if (error) {
 		return { error: "Error creating company: " + error.message }
@@ -169,7 +178,7 @@ export const createCompanyAction = async (formData: FormData): Promise<ActionRes
 }
 
 export const updateCompanyAction = async (formData: FormData): Promise<ActionResult> => {
-	const supabase = createClient()
+	const supabase = createServerSupabaseClient()
 
 	// Get the authenticated user
 	const {
@@ -189,49 +198,45 @@ export const updateCompanyAction = async (formData: FormData): Promise<ActionRes
 	}
 
 	// Extract all fields from the formData
-	const companyName = formData.get("company_name") as string
-	const description = formData.get("description") as string
-	const websiteUrl = formData.get("website_url") as string | null
-	const phoneNumber = formData.get("phone_number") as string | null
-	const logoString = formData.get("logo") as string | null
+	const company_name = formData.get("company_name")?.toString() || ""
+	const description = formData.get("description")?.toString() || ""
+	const websiteUrl = formData.get("website_url")?.toString() || null
+	const phoneNumber = formData.get("phone_number")?.toString() || null
+	const address = formData.get("address")?.toString() || null
+	const logoString = formData.get("logo")?.toString() || null
 
 	// Prepare the company data
-	const companyData: Partial<Company> = {
-		company_name: companyName,
-		description: description,
+	const updatePayload: Partial<Company> = {
+		company_name,
+		description,
 		website_url: websiteUrl || null,
 		phone_number: phoneNumber || null,
+		address: address || null,
 	}
 
 	// Handle logo data
-	if (formData.has("logo")) {
-		if (logoString) {
-			try {
-				// Parse the stringified data URL
-				const parsedLogoString = JSON.parse(logoString)
+	if (logoString) {
+		try {
+			// Parse the stringified data URL
+			const parsedLogoString = JSON.parse(logoString)
 
-				// Validate the parsed data (ensure it's a data URL)
-				if (typeof parsedLogoString === "string" && parsedLogoString.startsWith("data:image/")) {
-					companyData.logo = parsedLogoString
-				} else {
-					return { error: "Invalid logo data format" }
-				}
-			} catch (error) {
-				return { error: "Error processing logo data: " + (error as Error).message }
+			// Validate the parsed data (ensure it's a data URL)
+			if (typeof parsedLogoString === "string" && parsedLogoString.startsWith("data:image/")) {
+				updatePayload.logo = parsedLogoString
+			} else {
+				return { error: "Invalid logo data format" }
 			}
-		} else {
-			// If logoString is empty or null, remove the logo
-			companyData.logo = null
+		} catch (error) {
+			return { error: "Error processing logo data: " + (error as Error).message }
 		}
 	}
 
-	// Update the company in the database
-	const { error } = await supabase.from("companies").update(companyData).eq("id", existingCompany.id)
+	const { error } = await supabase.from("companies").update(updatePayload).eq("id", existingCompany.id)
 
 	if (error) {
-		return { error: "Error updating company: " + error.message }
+		return { error: "Error updating company: " + error.message + " " + JSON.stringify(updatePayload) }
 	}
 
 	// Success
-	return { success: true, message: "Company updated successfully" }
+	return { success: true, message: "Company updated successfully." }
 }

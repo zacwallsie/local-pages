@@ -12,9 +12,9 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { ArrowUpCircle, Loader2 } from "lucide-react"
-import { updateCompanyAction, ActionResult } from "@/lib/actions"
+import { updateCompanyAction, ActionResult } from "@/lib/supabase/actions"
 import { Separator } from "@/components/ui/separator"
-import { Company } from "@/types/company"
+import { Company } from "@/types/supabase"
 
 interface UpdateCompanyFormProps {
 	company: Company
@@ -37,6 +37,7 @@ const UpdateCompanySchema = Yup.object().shape({
 		.nullable(),
 	website_url: Yup.string().url("Invalid URL").nullable(),
 	phone_number: Yup.string().nullable(),
+	address: Yup.string().nullable(),
 })
 
 export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, onCancel, onSuccess }) => {
@@ -52,6 +53,7 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 			logo: null as File | null,
 			website_url: company.website_url || "",
 			phone_number: company.phone_number || "",
+			address: company.address || "",
 		},
 		validationSchema: UpdateCompanySchema,
 		onSubmit: async (values, { setSubmitting }) => {
@@ -63,6 +65,7 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 
 				formData.append("website_url", values.website_url || "")
 				formData.append("phone_number", values.phone_number || "")
+				formData.append("address", values.address || "")
 
 				if (values.logo instanceof File) {
 					const logoString = await new Promise<string>((resolve, reject) => {
@@ -76,7 +79,6 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 							}
 						}
 						reader.onerror = () => reject(new Error("Failed to read file"))
-						reader.readAsDataURL(values.logo)
 					})
 					formData.append("logo", logoString)
 				} else if (imagePreview !== company.logo) {
@@ -261,6 +263,25 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 									<p className="mt-1 text-sm text-aerial-slate">Provide a contact number for your company (if applicable).</p>
 									{formik.touched.phone_number && formik.errors.phone_number && (
 										<p className="mt-1 text-sm text-aerial-red">{formik.errors.phone_number}</p>
+									)}
+								</div>
+
+								<div>
+									<Label htmlFor="address" className="text-sm font-medium text-aerial-slate-dark">
+										Address
+									</Label>
+									<Textarea
+										id="address"
+										name="address"
+										onChange={formik.handleChange}
+										onBlur={formik.handleBlur}
+										value={formik.values.address}
+										placeholder="Company Address"
+										className="mt-1 h-24 bg-aerial-white border-aerial-blue"
+									/>
+									<p className="mt-1 text-sm text-aerial-slate">Enter your company's physical address (if applicable).</p>
+									{formik.touched.address && formik.errors.address && (
+										<p className="mt-1 text-sm text-aerial-red">{formik.errors.address}</p>
 									)}
 								</div>
 							</div>

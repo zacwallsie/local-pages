@@ -1,8 +1,9 @@
 import React from "react"
 import Image from "next/image"
-import { Users, TrendingUp, Megaphone, Clock, UserPlus, Briefcase, Smartphone, BarChart } from "lucide-react"
+import { UserPlus, Briefcase, Smartphone, BarChart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import Link from "next/link"
 
 const BusinessLandingPage = () => {
 	return (
@@ -16,9 +17,14 @@ const BusinessLandingPage = () => {
 							<p className="text-xl text-aerial-nude-light">
 								Create your business profile, showcase your services, and expand your reach with Local Pages.
 							</p>
-							<Button size="lg" className="bg-aerial-red hover:bg-aerial-red-light text-aerial-white font-normal transition-colors">
-								Get Started Free
-							</Button>
+							<Link href="/sign-up">
+								<Button
+									size="lg"
+									className="mt-4 bg-aerial-red hover:bg-aerial-red-light text-aerial-white font-normal transition-colors"
+								>
+									Get Started Free
+								</Button>
+							</Link>
 						</div>
 						<div className="relative aspect-square w-full max-w-md mx-auto lg:max-w-none">
 							<Image
@@ -125,12 +131,14 @@ const BusinessLandingPage = () => {
 				<div className="container mx-auto px-4 text-center">
 					<h2 className="text-3xl font-light mb-6">Get Started with Local Pages Today</h2>
 					<p className="text-lg text-aerial-blue-lightest mb-8">Join thousands of businesses connecting with local customers.</p>
-					<Button
-						size="lg"
-						className="bg-aerial-red hover:bg-aerial-red-light text-aerial-white font-normal text-lg px-8 py-3 transition-colors"
-					>
-						Create Your Free Company Account
-					</Button>
+					<Link href="/sign-up">
+						<Button
+							size="lg"
+							className="bg-aerial-red hover:bg-aerial-red-light text-aerial-white font-normal text-lg px-8 py-3 transition-colors"
+						>
+							Create Your Free Company Account
+						</Button>
+					</Link>
 				</div>
 			</section>
 		</>

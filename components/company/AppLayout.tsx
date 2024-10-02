@@ -3,11 +3,11 @@
 import React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Settings, MapPinned, User, LucideIcon, UserCircle, Building2, LogOut } from "lucide-react"
+import { HandPlatter, MapPinned, User, LucideIcon, Building2, LogOut } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Logo from "../shared/Logo"
-import { signOutAction } from "@/lib/actions"
+import { signOutAction } from "@/lib/supabase/actions"
 
 interface NavIconProps {
 	href: string
@@ -46,6 +46,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 	const pathname = usePathname()
 
 	const isActiveRoute = (route: string) => {
+		if (route === "/company") {
+			return pathname === route
+		}
 		return pathname.startsWith(route)
 	}
 
@@ -60,13 +63,36 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 	return (
 		<>
 			{/* Left Navbar */}
-			<nav className="w-14 bg-aerial-white shadow-sm border-r border-gray-200 relative">
+			<nav className="w-14 bg-aerial-white shadow-sm border-r border-gray-200 relative flex flex-col justify-between h-screen">
 				<div className="flex flex-col items-center py-3 space-y-3">
-					<Link href="/dashboard">
+					<Link href="/company">
 						<Logo height={30} width={30} className="bg-aerial-red rounded-full p-1.5" />
 					</Link>
-					<NavIcon href="/dashboard/company" icon={Building2} label="Company" isActive={isActiveRoute("/dashboard/company")} />
-					<NavIcon href="/dashboard/locations" icon={MapPinned} label="Locations" isActive={isActiveRoute("/dashboard/locations")} />
+					<NavIcon href="/company" icon={Building2} label="Company" isActive={isActiveRoute("/company")} />
+					<NavIcon href="/company/services" icon={HandPlatter} label="Services" isActive={isActiveRoute("/company/services")} />
+					<NavIcon href="/company/locations" icon={MapPinned} label="Locations" isActive={isActiveRoute("/company/locations")} />
+				</div>
+
+				{/* Logout Button */}
+				<div className="mb-4 flex flex-col items-center ">
+					<TooltipProvider delayDuration={100}>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<form action={signOutAction}>
+									<button onClick={handleLogout} className="p-1.5 rounded-lg transition-colors hover:bg-aerial-red-lightest">
+										<LogOut className="w-6 h-6 text-aerial-red-dark" />
+									</button>
+								</form>
+							</TooltipTrigger>
+							<TooltipContent
+								side="right"
+								className="z-50 bg-aerial-dark_blue-dark text-aerial-white border-aerial-dark_blue-dark py-1 px-2 ml-3 text-xs"
+								sideOffset={0}
+							>
+								<p>Log out</p>
+							</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
 				</div>
 			</nav>
 
@@ -79,13 +105,13 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 							<User className="w-5 h-5 text-aerial-blue-dark" />
 						</DropdownMenuTrigger>
 						<DropdownMenuContent className="w-56 bg-aerial-white" align="end" alignOffset={-8} forceMount>
-							<Link href="/dashboard/company">
+							<Link href="/company">
 								<DropdownMenuItem className="hover:bg-aerial-blue-lightest">
 									<Building2 className="mr-2 h-4 w-4 text-aerial-blue-dark" />
 									<span className="text-aerial-darks-light">Your Company</span>
 								</DropdownMenuItem>
 							</Link>
-							<Link href="/dashboard/locations">
+							<Link href="/company/locations">
 								<DropdownMenuItem className="hover:bg-aerial-blue-lightest">
 									<MapPinned className="mr-2 h-4 w-4 text-aerial-blue-dark" />
 									<span className="text-aerial-darks-light">Locations</span>

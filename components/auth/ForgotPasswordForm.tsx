@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ButtonWithState } from "@/components/shared/ButtonWithState"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
-import { forgotPasswordAction } from "@/lib/actions"
+import { forgotPasswordAction } from "@/lib/supabase/actions"
 
 // Define the type for the forgotPasswordAction return value
 type ForgotPasswordActionResult = { error: string } | { success: true } | undefined
