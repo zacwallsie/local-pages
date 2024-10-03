@@ -78,9 +78,7 @@ export const signInAction = async (formData: FormData): Promise<AuthResult> => {
 export const signOutAction = async (): Promise<void> => {
 	try {
 		await signOut()
-		redirect("/sign-in")
 	} catch (error) {
-		console.error("SignOutAction Error:", error)
 		redirect("/error")
 	}
 }

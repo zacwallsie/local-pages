@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { ExternalLink, Phone, Globe, Mail, AlertCircle } from "lucide-react"
+import { ExternalLink, Phone, Globe, Mail, AlertCircle, MapPin } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabaseClient } from "@/lib/supabase/client/client"
 import { useToast } from "@/hooks/use-toast"
@@ -76,6 +76,7 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({ company }) => {
 		{ icon: <Globe size={24} />, value: companyData.website_url, label: "Website", link: true },
 		{ icon: <Phone size={24} />, value: companyData.phone_number, label: "Phone" },
 		{ icon: <Mail size={24} />, value: companyData.email, label: "Email" },
+		{ icon: <MapPin size={24} />, value: companyData.address, label: "Address" },
 	].filter(
 		(detail): detail is { icon: JSX.Element; value: string; label: string; link?: boolean } =>
 			detail.value !== null && detail.value !== undefined && detail.value !== ""
