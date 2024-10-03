@@ -11,7 +11,7 @@ import { TogglePasswordVisibility } from "@/components/shared/TogglePasswordVisi
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { signUpAction } from "@/lib/supabase/actions"
+import { signUpAction } from "@/app/api/auth"
 
 const SignupSchema = Yup.object().shape({
 	email: Yup.string().email("Invalid email").required("Email is required"),

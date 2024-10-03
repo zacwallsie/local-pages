@@ -11,7 +11,7 @@ import { TogglePasswordVisibility } from "@/components/shared/TogglePasswordVisi
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { signInAction } from "@/lib/supabase/actions"
+import { signInAction } from "@/app/api/auth"
 
 type SignInActionResult = { error: string } | { success: true } | undefined
 

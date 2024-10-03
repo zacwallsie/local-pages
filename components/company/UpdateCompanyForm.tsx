@@ -1,5 +1,3 @@
-// components/company/UpdateCompanyForm.tsx
-
 "use client"
 
 import React, { useState, useCallback } from "react"
@@ -12,9 +10,21 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { ArrowUpCircle, Loader2 } from "lucide-react"
-import { updateCompanyAction, ActionResult } from "@/lib/supabase/actions"
+import { updateCompanyAction } from "@/app/api/company"
+import { deleteCompanyAction } from "@/app/api/company"
 import { Separator } from "@/components/ui/separator"
 import { Company } from "@/types/supabase"
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 interface UpdateCompanyFormProps {
 	company: Company
@@ -45,12 +55,13 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 
 	const [imagePreview, setImagePreview] = useState<string | null>(company.logo || null)
 	const [loading, setLoading] = useState(false)
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
 	const formik = useFormik({
 		initialValues: {
 			company_name: company.company_name || "",
 			description: company.description || "",
-			logo: null as File | null,
+			logo: null as File | null as File,
 			website_url: company.website_url || "",
 			phone_number: company.phone_number || "",
 			address: company.address || "",
@@ -79,14 +90,12 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 							}
 						}
 						reader.onerror = () => reject(new Error("Failed to read file"))
+						reader.readAsDataURL(values.logo)
 					})
 					formData.append("logo", logoString)
-				} else if (imagePreview !== company.logo) {
-					// If the logo was removed
-					formData.append("logo", "")
 				}
 
-				const result: ActionResult = await updateCompanyAction(formData)
+				const result = await updateCompanyAction(formData)
 
 				if ("error" in result) {
 					toast({
@@ -138,8 +147,40 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 		[formik]
 	)
 
+	const handleDeleteAccount = async () => {
+		setLoading(true)
+		try {
+			const result = await deleteCompanyAction()
+
+			if ("error" in result) {
+				toast({
+					variant: "destructive",
+					title: "Company Deletion Failed",
+					description: result.error,
+				})
+			} else {
+				toast({
+					variant: "default",
+					title: "Company Deleted",
+					description: "Your account has been successfully deleted.",
+				})
+				// Redirect to home page or sign-in page after successful deletion
+				window.location.href = "/"
+			}
+		} catch (error: any) {
+			toast({
+				variant: "destructive",
+				title: "Something Went Wrong",
+				description: error.message,
+			})
+		} finally {
+			setLoading(false)
+			setIsDeleteDialogOpen(false)
+		}
+	}
+
 	return (
-		<div className="w-full max-w-4xl mx-auto space-y-8">
+		<div className="w-full space-y-16">
 			<Card className="bg-aerial-white">
 				<CardHeader className="bg-aerial-blue-light">
 					<CardTitle className="text-2xl font-bold text-aerial-dark_blue-dark">Update Company</CardTitle>
@@ -222,7 +263,6 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 											/>
 										</label>
 										<span className="text-sm text-aerial-slate">Upload a PNG or JPEG (max 2MB)</span>
-										{formik.touched.logo && formik.errors.logo && <p className="text-sm text-aerial-red">{formik.errors.logo}</p>}
 									</div>
 								</div>
 
@@ -305,6 +345,48 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 							</Button>
 						</div>
 					</form>
+				</CardContent>
+			</Card>
+
+			{/* Danger Zone Card */}
+			<Card className="bg-aerial-red-lightest border-aerial-red">
+				<CardContent className="mt-4">
+					<div className="flex justify-between items-center">
+						<div>
+							<h4 className="text-lg font-semibold text-aerial-red-dark">Delete Company</h4>
+							<p className="text-sm text-aerial-red">Permanently remove your company and all associated data.</p>
+						</div>
+						<AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+							<AlertDialogTrigger asChild>
+								<Button variant="destructive">Delete Company</Button>
+							</AlertDialogTrigger>
+							<AlertDialogContent>
+								<AlertDialogHeader>
+									<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+									<AlertDialogDescription>
+										This action cannot be undone. This will permanently delete your company and remove all data associated with
+										your company and any services stored.
+										<br />
+										<br />
+										<b>This will not delete your user account, please contact support to delete your individual user account.</b>
+									</AlertDialogDescription>
+								</AlertDialogHeader>
+								<AlertDialogFooter>
+									<AlertDialogCancel>Cancel</AlertDialogCancel>
+									<AlertDialogAction onClick={handleDeleteAccount} disabled={loading} className="bg-red-600 hover:bg-red-700">
+										{loading ? (
+											<>
+												<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+												Deleting...
+											</>
+										) : (
+											"Yes, delete my company"
+										)}
+									</AlertDialogAction>
+								</AlertDialogFooter>
+							</AlertDialogContent>
+						</AlertDialog>
+					</div>
 				</CardContent>
 			</Card>
 		</div>

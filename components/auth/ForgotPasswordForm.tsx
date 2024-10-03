@@ -5,11 +5,11 @@ import { useFormik } from "formik"
 import * as Yup from "yup"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { ButtonWithState } from "@/components/shared/ButtonWithState"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
-import { forgotPasswordAction } from "@/lib/supabase/actions"
+import { forgotPasswordAction } from "@/app/api/auth"
 
 // Define the type for the forgotPasswordAction return value
 type ForgotPasswordActionResult = { error: string } | { success: true } | undefined

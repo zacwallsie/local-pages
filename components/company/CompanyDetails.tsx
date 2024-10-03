@@ -3,7 +3,7 @@
 "use client"
 
 import React, { useState, useEffect, useCallback } from "react"
-import { Company } from "@/types/supabase"
+import { Company, User } from "@/types/supabase"
 import { UpdateCompanyForm } from "./UpdateCompanyForm"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -11,8 +11,9 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { ExternalLink, Phone, Globe, Mail, AlertCircle } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { supabaseClient } from "@/lib/supabase/client" // Import the Supabase client
-import { useToast } from "@/hooks/use-toast" // Ensure you have this hook for toast notifications
+import { supabaseClient } from "@/lib/supabase/client"
+import { useToast } from "@/hooks/use-toast"
+import { SkeletonLoadingCard } from "@/components/shared/SkeletonLoadingCard"
 
 interface CompanyDetailsProps {
 	company: Company
@@ -80,8 +81,17 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({ company }) => {
 			detail.value !== null && detail.value !== undefined && detail.value !== ""
 	)
 
+	if (loading) {
+		return (
+			<div className="w-full space-y-6">
+				<SkeletonLoadingCard />
+				<SkeletonLoadingCard />
+			</div>
+		)
+	}
+
 	return (
-		<div className="w-full max-w-4xl mx-auto space-y-6">
+		<div className="w-full space-y-6">
 			<Card className="bg-aerial-white">
 				<CardHeader className="space-y-4 bg-aerial-blue-lightest rounded-t-lg p-6">
 					<div className="flex items-center space-x-4">

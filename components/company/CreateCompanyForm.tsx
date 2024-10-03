@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { ArrowUpCircle, Loader2, CheckCircle2, MapPin, Package } from "lucide-react"
-import { createCompanyAction } from "@/lib/supabase/actions"
+import { createCompanyAction } from "@/app/api/company"
 import { Steps, Step } from "./Steps"
 import { Separator } from "@/components/ui/separator"
 
@@ -45,7 +45,7 @@ export function CreateCompanyForm() {
 		initialValues: {
 			company_name: "",
 			description: "",
-			logo: null as File | null,
+			logo: null as File | null as File,
 			website_url: "",
 			phone_number: "",
 			address: "",
@@ -80,6 +80,7 @@ export function CreateCompanyForm() {
 							}
 						}
 						reader.onerror = () => reject(new Error("Failed to read file"))
+						reader.readAsDataURL(values.logo)
 					})
 					formData.append("logo", logoString)
 				}
@@ -137,7 +138,7 @@ export function CreateCompanyForm() {
 	)
 
 	return (
-		<div className="w-full max-w-4xl mx-auto mt-10 space-y-8">
+		<div className="w-full mt-10 space-y-6">
 			<Card className="p-6">
 				<CardHeader>
 					<CardTitle className="text-2xl font-bold text-aerial-dark_blue-dark">Getting Started</CardTitle>
@@ -233,7 +234,6 @@ export function CreateCompanyForm() {
 											/>
 										</label>
 										<span className="text-sm text-aerial-slate">Upload a PNG or JPEG (max 2MB)</span>
-										{formik.touched.logo && formik.errors.logo && <p className="text-sm text-aerial-red">{formik.errors.logo}</p>}
 									</div>
 								</div>
 

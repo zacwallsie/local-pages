@@ -14,7 +14,7 @@ const CompanyPage = async () => {
 
 	// Render the protected content
 	return (
-		<div className="my-14 mx-6">
+		<div className="container mx-auto py-10 mt-6">
 			<CompanyDetails company={company} />
 		</div>
 	)
