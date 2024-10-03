@@ -1,6 +1,6 @@
-import { resetPasswordAction } from "@/lib/supabase/actions"
-import { FormMessage, Message } from "@/components/form-message"
-import { SubmitButton } from "@/components/submit-button"
+import { resetPasswordAction } from "@/lib/supabase/server/auth"
+import { FormMessage, Message } from "@/components/shared/FormMessage"
+import { SubmitButton } from "@/components/shared/SubmitButton"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 

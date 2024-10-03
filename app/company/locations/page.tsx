@@ -2,7 +2,7 @@ import React from "react"
 import { Metadata } from "next"
 import app from "@/lib/app"
 import { ClientSideMap } from "@/components/locations/ClientSideMap"
-import { getAuthenticatedUserAndCompany } from "@/lib/supabase/serverUtils"
+import { getAuthenticatedUserAndCompany } from "@/lib/supabase/client/serverUtils"
 
 export const metadata: Metadata = {
 	title: `${app.name} - Locations`,

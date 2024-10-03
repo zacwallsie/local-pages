@@ -11,7 +11,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { ExternalLink, Phone, Globe, Mail, AlertCircle } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { supabaseClient } from "@/lib/supabase/client"
+import { supabaseClient } from "@/lib/supabase/client/client"
 import { useToast } from "@/hooks/use-toast"
 import { SkeletonLoadingCard } from "@/components/shared/SkeletonLoadingCard"
 
@@ -60,7 +60,7 @@ export const CompanyDetails: React.FC<CompanyDetailsProps> = ({ company }) => {
 		fetchCompany() // Refresh the company data
 	}
 
-	// Optional: Refetch company data when the component mounts or when the company prop changes
+	// Refetch company data when the component mounts or when the company prop changes
 	useEffect(() => {
 		if (company.id !== companyData.id) {
 			fetchCompany()

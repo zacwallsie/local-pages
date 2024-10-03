@@ -22,7 +22,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Service } from "@/types/supabase"
 import { CreateServiceDialog } from "./CreateServiceDialog"
-import { getServicesAction, updateServiceAction, deleteServiceAction } from "@/app/api/service"
+import { getServicesAction, updateServiceAction, deleteServiceAction } from "@/lib/supabase/server/service"
 import { useToast } from "@/hooks/use-toast"
 import { SkeletonLoadingCard } from "@/components/shared/SkeletonLoadingCard"
 import { createColumns } from "./columns"

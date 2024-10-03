@@ -11,10 +11,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { ArrowUpCircle, Loader2, CheckCircle2, MapPin, Package } from "lucide-react"
-import { createCompanyAction } from "@/app/api/company"
+import { createCompanyAction } from "@/lib/supabase/server/company"
 import { Steps, Step } from "./Steps"
 import { Separator } from "@/components/ui/separator"
 
+/**
+ * Validation schema for the Create Company form using Yup.
+ * Ensures that required fields are filled and that the logo meets size and format requirements.
+ */
 const CreateCompanySchema = Yup.object().shape({
 	company_name: Yup.string().required("Company Name is required"),
 	description: Yup.string().required("Description is required"),
@@ -32,15 +36,31 @@ const CreateCompanySchema = Yup.object().shape({
 	phone_number: Yup.string().nullable(),
 })
 
-type createCompanyActionResult = { error: string } | { success: true } | undefined
+/**
+ * Represents the result of the createCompanyAction.
+ * It can either contain an error message or indicate success.
+ */
+type CreateCompanyActionResult = { error: string } | { success: true } | undefined
 
-export function CreateCompanyForm() {
-	const { toast } = useToast()
-	const router = useRouter()
+/**
+ * CreateCompanyForm Component
+ *
+ * Renders a form that allows users to create a new company profile.
+ * Utilizes Formik for form state management and Yup for validation.
+ *
+ * @returns {JSX.Element} The rendered Create Company form.
+ */
+export function CreateCompanyForm(): JSX.Element {
+	const { toast } = useToast() // Hook for displaying toast notifications
+	const router = useRouter() // Hook for navigation
 
+	// State to manage the image preview of the uploaded logo
 	const [imagePreview, setImagePreview] = useState<string | null>(null)
-	const [loading, setLoading] = useState(false)
+	const [loading, setLoading] = useState(false) // State to manage the loading indicator
 
+	/**
+	 * Initialize Formik with initial values, validation schema, and submit handler.
+	 */
 	const formik = useFormik({
 		initialValues: {
 			company_name: "",
@@ -52,8 +72,9 @@ export function CreateCompanyForm() {
 		},
 		validationSchema: CreateCompanySchema,
 		onSubmit: async (values, { setSubmitting }) => {
-			setLoading(true)
+			setLoading(true) // Show loading indicator
 			try {
+				// Create a FormData object and append form values
 				const formData = new FormData()
 				formData.append("company_name", values.company_name)
 				formData.append("description", values.description)
@@ -68,6 +89,7 @@ export function CreateCompanyForm() {
 					formData.append("address", values.address)
 				}
 
+				// Handle logo upload if a file is provided
 				if (values.logo instanceof File) {
 					const logoString = await new Promise<string>((resolve, reject) => {
 						const reader = new FileReader()
@@ -85,53 +107,64 @@ export function CreateCompanyForm() {
 					formData.append("logo", logoString)
 				}
 
-				const result = (await createCompanyAction(formData)) as createCompanyActionResult
+				// Call the createCompanyAction with the form data
+				const result = (await createCompanyAction(formData)) as CreateCompanyActionResult
 
+				// Handle errors returned from createCompanyAction
 				if (result && "error" in result) {
 					toast({
 						variant: "destructive",
 						title: "Company Creation Failed",
 						description: result.error,
 					})
-				} else if (result && "success" in result) {
+				}
+				// Handle successful company creation
+				else if (result && "success" in result) {
 					toast({
 						variant: "default",
 						title: "Company Created",
 						description: "Your company has been created successfully",
 					})
-					router.push("/company")
+					router.push("/company") // Redirect to the company page upon success
 				}
 			} catch (error: any) {
+				// Handle unexpected errors during the company creation process
 				toast({
 					variant: "destructive",
 					title: "Something Went Wrong",
 					description: error.message,
 				})
 			} finally {
-				setLoading(false)
-				setSubmitting(false)
+				setLoading(false) // Hide loading indicator
+				setSubmitting(false) // Re-enable the submit button
 			}
 		},
 	})
 
+	/**
+	 * Handle changes to the logo input field.
+	 * Updates the form state and sets the image preview.
+	 *
+	 * @param {React.ChangeEvent<HTMLInputElement>} e - The change event from the logo input field.
+	 */
 	const handleLogoChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const file = e.target.files?.[0]
 
 			if (file) {
-				formik.setFieldValue("logo", file)
+				formik.setFieldValue("logo", file) // Update Formik's state with the selected file
 
 				const reader = new FileReader()
 				reader.onload = (e) => {
 					const result = e.target?.result
 					if (typeof result === "string") {
-						setImagePreview(result)
+						setImagePreview(result) // Set the image preview
 					}
 				}
-				reader.readAsDataURL(file)
+				reader.readAsDataURL(file) // Read the file as a data URL for preview
 			} else {
-				formik.setFieldValue("logo", null)
-				setImagePreview(null)
+				formik.setFieldValue("logo", null) // Reset the logo field if no file is selected
+				setImagePreview(null) // Remove the image preview
 			}
 		},
 		[formik]
@@ -139,6 +172,7 @@ export function CreateCompanyForm() {
 
 	return (
 		<div className="w-full mt-10 space-y-6">
+			{/* Step Indicator Card */}
 			<Card className="p-6">
 				<CardHeader>
 					<CardTitle className="text-2xl font-bold text-aerial-dark_blue-dark">Getting Started</CardTitle>
@@ -152,6 +186,7 @@ export function CreateCompanyForm() {
 				</CardContent>
 			</Card>
 
+			{/* Create Company Form Card */}
 			<Card className="bg-aerial-white">
 				<CardHeader className="bg-aerial-blue-light">
 					<CardTitle className="text-2xl font-bold text-aerial-dark_blue-dark">Create Company</CardTitle>
@@ -161,9 +196,11 @@ export function CreateCompanyForm() {
 				</CardHeader>
 				<CardContent className="mt-4">
 					<form onSubmit={formik.handleSubmit} className="space-y-8">
+						{/* Required Information Section */}
 						<div className="space-y-6">
 							<h3 className="text-lg font-semibold text-aerial-blue-dark">Required Information</h3>
 							<div className="space-y-4">
+								{/* Company Name Field */}
 								<div>
 									<Label htmlFor="company_name" className="text-sm font-medium text-aerial-slate-dark">
 										Company Name
@@ -178,11 +215,13 @@ export function CreateCompanyForm() {
 										placeholder="Your Company Name"
 										className="mt-1 bg-aerial-white border-aerial-blue"
 									/>
+									{/* Display validation error for company_name */}
 									{formik.touched.company_name && formik.errors.company_name && (
 										<p className="mt-1 text-sm text-aerial-red">{formik.errors.company_name}</p>
 									)}
 								</div>
 
+								{/* Description Field */}
 								<div>
 									<Label htmlFor="description" className="text-sm font-medium text-aerial-slate-dark">
 										Description
@@ -196,6 +235,7 @@ export function CreateCompanyForm() {
 										placeholder="Company Description"
 										className="mt-1 h-24 bg-aerial-white border-aerial-blue"
 									/>
+									{/* Display validation error for description */}
 									{formik.touched.description && formik.errors.description && (
 										<p className="mt-1 text-sm text-aerial-red">{formik.errors.description}</p>
 									)}
@@ -205,9 +245,11 @@ export function CreateCompanyForm() {
 
 						<Separator className="my-8 h-0.5" />
 
+						{/* Optional Information Section */}
 						<div className="space-y-6">
 							<h3 className="text-lg font-semibold text-aerial-blue-dark">Optional Information</h3>
 							<div className="space-y-4">
+								{/* Logo Upload Field */}
 								<div>
 									<Label htmlFor="logo" className="text-sm font-medium text-aerial-slate-dark">
 										Logo
@@ -237,6 +279,7 @@ export function CreateCompanyForm() {
 									</div>
 								</div>
 
+								{/* Website URL Field */}
 								<div>
 									<Label htmlFor="website_url" className="text-sm font-medium text-aerial-slate-dark">
 										Website URL
@@ -252,11 +295,13 @@ export function CreateCompanyForm() {
 										className="mt-1 bg-aerial-white border-aerial-blue"
 									/>
 									<p className="mt-1 text-sm text-aerial-slate">Enter your company's website address if available.</p>
+									{/* Display validation error for website_url */}
 									{formik.touched.website_url && formik.errors.website_url && (
 										<p className="mt-1 text-sm text-aerial-red">{formik.errors.website_url}</p>
 									)}
 								</div>
 
+								{/* Phone Number Field */}
 								<div>
 									<Label htmlFor="phone_number" className="text-sm font-medium text-aerial-slate-dark">
 										Phone Number
@@ -272,32 +317,36 @@ export function CreateCompanyForm() {
 										className="mt-1 bg-aerial-white border-aerial-blue"
 									/>
 									<p className="mt-1 text-sm text-aerial-slate">Provide a contact number for your company (if applicable).</p>
+									{/* Display validation error for phone_number */}
 									{formik.touched.phone_number && formik.errors.phone_number && (
 										<p className="mt-1 text-sm text-aerial-red">{formik.errors.phone_number}</p>
 									)}
 								</div>
-							</div>
 
-							<div>
-								<Label htmlFor="address" className="text-sm font-medium text-aerial-slate-dark">
-									Address
-								</Label>
-								<Textarea
-									id="address"
-									name="address"
-									onChange={formik.handleChange}
-									onBlur={formik.handleBlur}
-									value={formik.values.address}
-									placeholder="Company Address"
-									className="mt-1 h-24 bg-aerial-white border-aerial-blue"
-								/>
-								<p className="mt-1 text-sm text-aerial-slate">Enter your company's physical address (if applicable).</p>
-								{formik.touched.address && formik.errors.address && (
-									<p className="mt-1 text-sm text-aerial-red">{formik.errors.address}</p>
-								)}
+								{/* Address Field */}
+								<div>
+									<Label htmlFor="address" className="text-sm font-medium text-aerial-slate-dark">
+										Address
+									</Label>
+									<Textarea
+										id="address"
+										name="address"
+										onChange={formik.handleChange}
+										onBlur={formik.handleBlur}
+										value={formik.values.address}
+										placeholder="Company Address"
+										className="mt-1 h-24 bg-aerial-white border-aerial-blue"
+									/>
+									<p className="mt-1 text-sm text-aerial-slate">Enter your company's physical address (if applicable).</p>
+									{/* Display validation error for address */}
+									{formik.touched.address && formik.errors.address && (
+										<p className="mt-1 text-sm text-aerial-red">{formik.errors.address}</p>
+									)}
+								</div>
 							</div>
 						</div>
 
+						{/* Submit Button */}
 						<Button type="submit" className="w-full" disabled={!formik.dirty || !formik.isValid || loading}>
 							{loading ? (
 								<>

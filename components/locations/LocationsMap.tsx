@@ -1,6 +1,8 @@
+// components/locations/LocationsMap.tsx
+
 "use client"
 
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect, useCallback } from "react"
 import { MapContainer, TileLayer, FeatureGroup, ZoomControl, GeoJSON, useMapEvents } from "react-leaflet"
 import { EditControl } from "react-leaflet-draw"
 import "leaflet/dist/leaflet.css"
@@ -9,15 +11,15 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Company, ServiceArea, Service, ServiceCategory, ServiceCategoryInternalName } from "@/types/supabase"
 import * as L from "leaflet"
 import { GeoJSON as GeoJSONType } from "geojson"
 import Link from "next/link"
-import { getServicesAction } from "@/app/api/service"
-import { createServiceAreaAction, updateServiceAreaAction, deleteServiceAreaAction, getServiceAreasAction } from "@/app/api/service_area"
+import { getServicesAction } from "@/lib/supabase/server/service"
+import { createServiceAreaAction, updateServiceAreaAction, deleteServiceAreaAction, getServiceAreasAction } from "@/lib/supabase/server/service_area"
 import { useToast } from "@/hooks/use-toast"
-import { Edit, Trash } from "lucide-react"
+import { Edit, Trash, Loader2 } from "lucide-react"
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -31,16 +33,39 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 
+/**
+ * Props for the LocationsMap component.
+ *
+ * @interface LocationsMapProps
+ * @property {Company} company - The company data to display on the map.
+ */
 interface LocationsMapProps {
 	company: Company
 }
 
+/**
+ * Coordinates for the center of Brisbane.
+ *
+ * @constant
+ * @type {[number, number]}
+ */
 const BRISBANE_CENTER: [number, number] = [-27.4698, 153.0251]
 
+/**
+ * AddServiceAreaControl Component
+ *
+ * Adds a custom control button to the Leaflet map for adding service areas.
+ *
+ * @param {Object} props - The component props.
+ * @param {() => void} props.onClick - Callback function to handle the button click.
+ * @param {boolean} props.isVisible - Determines whether the control is visible.
+ * @returns {null} This component does not render any JSX directly.
+ */
 const AddServiceAreaControl = ({ onClick, isVisible }: { onClick: () => void; isVisible: boolean }) => {
 	useEffect(() => {
 		if (!isVisible) return
 
+		// Create a container for the control
 		const controlContainer = L.DomUtil.create("div", "leaflet-bar leaflet-control")
 		const button = L.DomUtil.create("a", "leaflet-control-button", controlContainer)
 		button.innerHTML = `
@@ -57,11 +82,13 @@ const AddServiceAreaControl = ({ onClick, isVisible }: { onClick: () => void; is
 		button.style.alignItems = "center"
 		button.style.justifyContent = "center"
 
+		// Prevent map interactions when clicking the button
 		L.DomEvent.addListener(button, "click", (e) => {
 			L.DomEvent.stopPropagation(e)
 			onClick()
 		})
 
+		// Append the control to the top-right of the map
 		const leafletContainer = document.querySelector(".leaflet-control-container")
 		if (leafletContainer) {
 			const topRightControls = leafletContainer.querySelector(".leaflet-top.leaflet-right")
@@ -70,6 +97,7 @@ const AddServiceAreaControl = ({ onClick, isVisible }: { onClick: () => void; is
 			}
 		}
 
+		// Cleanup on unmount
 		return () => {
 			controlContainer.remove()
 		}
@@ -78,6 +106,15 @@ const AddServiceAreaControl = ({ onClick, isVisible }: { onClick: () => void; is
 	return null
 }
 
+/**
+ * MapClickHandler Component
+ *
+ * Handles map click events to deselect any selected service area.
+ *
+ * @param {Object} props - The component props.
+ * @param {() => void} props.onMapClick - Callback function to handle map clicks.
+ * @returns {null} This component does not render any JSX directly.
+ */
 function MapClickHandler({ onMapClick }: { onMapClick: () => void }) {
 	useMapEvents({
 		click: (e) => {
@@ -90,7 +127,19 @@ function MapClickHandler({ onMapClick }: { onMapClick: () => void }) {
 	return null
 }
 
-function LocationsMap({ company }: LocationsMapProps) {
+/**
+ * LocationsMap Component
+ *
+ * Renders a Leaflet map with functionalities to add, edit, and delete service areas.
+ *
+ * @param {LocationsMapProps} props - The properties passed to the component.
+ * @param {Company} props.company - The company data to display on the map.
+ * @returns {JSX.Element} The rendered Leaflet map with service area functionalities.
+ */
+function LocationsMap({ company }: LocationsMapProps): JSX.Element {
+	const { toast } = useToast() // Hook for displaying toast notifications
+
+	// State variables
 	const [mode, setMode] = useState<"drawServiceArea" | "editServiceArea" | null>(null)
 	const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([])
 	const [services, setServices] = useState<Service[]>([])
@@ -99,15 +148,22 @@ function LocationsMap({ company }: LocationsMapProps) {
 	const [selectedService, setSelectedService] = useState<string | null>(null)
 	const [isActive, setIsActive] = useState(true)
 	const [loading, setLoading] = useState(false)
+
+	// Refs for map and feature group
 	const mapRef = useRef<L.Map>(null)
 	const featureGroupRef = useRef<L.FeatureGroup>(null)
-	const { toast } = useToast()
 
+	/**
+	 * Fetches service areas and services on component mount.
+	 */
 	useEffect(() => {
 		loadServiceAreas()
 		loadServices()
-	}, [serviceAreas.length])
+	}, [])
 
+	/**
+	 * Loads service areas from the server.
+	 */
 	const loadServiceAreas = async () => {
 		const result = await getServiceAreasAction(company.id)
 		if (result.success && result.data) {
@@ -121,6 +177,9 @@ function LocationsMap({ company }: LocationsMapProps) {
 		}
 	}
 
+	/**
+	 * Loads services from the server.
+	 */
 	const loadServices = async () => {
 		const result = await getServicesAction(company.id)
 		if (result.success && result.data) {
@@ -134,6 +193,11 @@ function LocationsMap({ company }: LocationsMapProps) {
 		}
 	}
 
+	/**
+	 * Handles mode changes (draw or edit service area).
+	 *
+	 * @param {"drawServiceArea" | "editServiceArea"} newMode - The new mode to set.
+	 */
 	const handleModeChange = (newMode: "drawServiceArea" | "editServiceArea") => {
 		setMode(newMode)
 		setSelectedServiceArea(null)
@@ -145,6 +209,9 @@ function LocationsMap({ company }: LocationsMapProps) {
 		}
 	}
 
+	/**
+	 * Cancels the current edit or draw operation.
+	 */
 	const handleCancelEdit = () => {
 		setMode(null)
 		setSelectedServiceArea(null)
@@ -157,6 +224,9 @@ function LocationsMap({ company }: LocationsMapProps) {
 		loadServiceAreas() // Reload service areas after canceling edit
 	}
 
+	/**
+	 * Saves a new service area to the server.
+	 */
 	const handleSaveServiceArea = async () => {
 		if (!newServiceArea || !selectedService) {
 			toast({
@@ -166,6 +236,7 @@ function LocationsMap({ company }: LocationsMapProps) {
 			})
 			return
 		}
+
 		// Ensure that newServiceArea is a Polygon
 		if (newServiceArea.type !== "Polygon") {
 			toast({
@@ -176,6 +247,8 @@ function LocationsMap({ company }: LocationsMapProps) {
 			return
 		}
 
+		setLoading(true)
+
 		const formData = new FormData()
 		formData.append("service_id", selectedService)
 		formData.append("company_id", company.id)
@@ -183,6 +256,7 @@ function LocationsMap({ company }: LocationsMapProps) {
 		formData.append("is_active", isActive.toString())
 
 		const result = await createServiceAreaAction(formData)
+
 		setLoading(false)
 
 		if (result.success) {
@@ -201,6 +275,9 @@ function LocationsMap({ company }: LocationsMapProps) {
 		}
 	}
 
+	/**
+	 * Updates an existing service area on the server.
+	 */
 	const handleUpdateServiceArea = async () => {
 		if (!selectedServiceArea) return
 
@@ -214,6 +291,7 @@ function LocationsMap({ company }: LocationsMapProps) {
 		formData.append("company_id", company.id)
 
 		const result = await updateServiceAreaAction(formData)
+
 		setLoading(false)
 
 		if (result.success) {
@@ -232,12 +310,16 @@ function LocationsMap({ company }: LocationsMapProps) {
 		}
 	}
 
+	/**
+	 * Deletes a service area from the server.
+	 */
 	const handleDeleteServiceArea = async () => {
 		if (!selectedServiceArea) return
 
 		setLoading(true)
 
 		const result = await deleteServiceAreaAction(selectedServiceArea.id)
+
 		setLoading(false)
 
 		if (result.success) {
@@ -256,6 +338,9 @@ function LocationsMap({ company }: LocationsMapProps) {
 		}
 	}
 
+	/**
+	 * Updates the geometry of the selected service area based on map interactions.
+	 */
 	const updateSelectedServiceAreaGeometries = () => {
 		const layers = featureGroupRef.current?.getLayers()
 		if (layers && layers.length === 1) {
@@ -282,12 +367,22 @@ function LocationsMap({ company }: LocationsMapProps) {
 		}
 	}
 
+	/**
+	 * Handles the editing of service areas.
+	 *
+	 * @param {L.DrawEvents.Edited} e - The edit event from Leaflet.
+	 */
 	const onEdited = (e: L.DrawEvents.Edited) => {
 		if (mode === "editServiceArea" && selectedServiceArea) {
 			updateSelectedServiceAreaGeometries()
 		}
 	}
 
+	/**
+	 * Handles the creation of new service areas.
+	 *
+	 * @param {L.DrawEvents.Created} e - The create event from Leaflet.
+	 */
 	const onCreated = (e: L.DrawEvents.Created) => {
 		const layer = e.layer
 
@@ -304,18 +399,31 @@ function LocationsMap({ company }: LocationsMapProps) {
 		}
 	}
 
+	/**
+	 * Handles the deletion of service areas.
+	 *
+	 * @param {L.DrawEvents.Deleted} e - The delete event from Leaflet.
+	 */
 	const onDeleted = (e: L.DrawEvents.Deleted) => {
 		if (mode === "editServiceArea" && selectedServiceArea) {
 			updateSelectedServiceAreaGeometries()
 		}
 	}
 
+	/**
+	 * Handles the selection of a service area when clicked on the map.
+	 *
+	 * @param {ServiceArea} area - The service area that was clicked.
+	 */
 	const handleServiceAreaClick = (area: ServiceArea) => {
 		setSelectedServiceArea(area)
 		setSelectedService(area.service_id.toString())
 		setIsActive(area.is_active)
 	}
 
+	/**
+	 * Initiates the edit mode for the selected service area.
+	 */
 	const handleEditServiceArea = () => {
 		setMode("editServiceArea")
 		if (mapRef.current && selectedServiceArea) {
@@ -324,14 +432,38 @@ function LocationsMap({ company }: LocationsMapProps) {
 		}
 	}
 
-	// useEffect to manage GeoJSON layers
+	/**
+	 * Handles the update of the selected service area's geometries.
+	 */
+	const handleUpdateServiceAreaGeometries = () => {
+		const layers = featureGroupRef.current?.getLayers()
+		if (layers && layers.length === 1) {
+			const layer = layers[0] as L.Polygon
+
+			const geojson = layer.toGeoJSON() as GeoJSON.Feature<GeoJSON.Geometry>
+			const geometry = geojson.geometry
+
+			setSelectedServiceArea((prevArea) =>
+				prevArea
+					? {
+							...prevArea,
+							geojson: geometry,
+						}
+					: null
+			)
+		}
+	}
+
+	/**
+	 * Effect hook to manage GeoJSON layers on the map based on service areas and mode.
+	 */
 	useEffect(() => {
 		if (!featureGroupRef.current) return
 
 		// Clear existing layers
 		featureGroupRef.current.clearLayers()
 
-		// Add service area layers
+		// Add service area layers if not in edit or draw mode
 		if (mode !== "editServiceArea" && mode !== "drawServiceArea") {
 			serviceAreas.forEach((area) => {
 				const geojsonLayer = L.geoJSON(area.geojson as GeoJSONType, {
@@ -353,6 +485,9 @@ function LocationsMap({ company }: LocationsMapProps) {
 		}
 	}, [serviceAreas, mode])
 
+	/**
+	 * Effect hook to manage the selected service area's layer when in edit mode.
+	 */
 	useEffect(() => {
 		if (mode === "editServiceArea" && selectedServiceArea && featureGroupRef.current) {
 			featureGroupRef.current.clearLayers()
@@ -367,19 +502,25 @@ function LocationsMap({ company }: LocationsMapProps) {
 			<div className="flex flex-grow w-full z-0">
 				<div className={`relative h-full transition-all duration-300 ${mode ? "w-full" : "w-full"}`}>
 					<MapContainer center={BRISBANE_CENTER} zoom={11} style={{ height: "100%", width: "100%" }} zoomControl={false}>
+						{/* Base Map Layer */}
 						<TileLayer
 							url="https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png"
 							attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 						/>
 						<ZoomControl position="topright" />
 
+						{/* Custom Control Button for Adding Service Areas */}
 						<AddServiceAreaControl onClick={() => handleModeChange("drawServiceArea")} isVisible={!mode} />
 
+						{/* Feature Group for Service Areas */}
 						<FeatureGroup ref={featureGroupRef}>
+							{/* Edit Control for Drawing Service Areas */}
 							{mode === "drawServiceArea" && (
 								<EditControl
 									position="topright"
 									onCreated={onCreated}
+									onEdited={onEdited}
+									onDeleted={onDeleted}
 									draw={{
 										rectangle: false,
 										circle: false,
@@ -390,29 +531,29 @@ function LocationsMap({ company }: LocationsMapProps) {
 									}}
 								/>
 							)}
+							{/* Edit Control for Editing Service Areas */}
 							{mode === "editServiceArea" && selectedServiceArea && (
-								<>
-									<EditControl
-										position="topright"
-										onEdited={onEdited}
-										onCreated={onCreated}
-										onDeleted={onDeleted}
-										edit={{
-											featureGroup: featureGroupRef.current!,
-											remove: true,
-											edit: true,
-										}}
-										draw={{
-											rectangle: false,
-											circle: false,
-											circlemarker: false,
-											marker: false,
-											polyline: false,
-											polygon: true,
-										}}
-									/>
-								</>
+								<EditControl
+									position="topright"
+									onEdited={onEdited}
+									onCreated={onCreated}
+									onDeleted={onDeleted}
+									edit={{
+										featureGroup: featureGroupRef.current!,
+										remove: true,
+										edit: true,
+									}}
+									draw={{
+										rectangle: false,
+										circle: false,
+										circlemarker: false,
+										marker: false,
+										polyline: false,
+										polygon: true,
+									}}
+								/>
 							)}
+							{/* Display Existing Service Areas */}
 							{mode !== "editServiceArea" &&
 								mode !== "drawServiceArea" &&
 								serviceAreas.map((area) => (
@@ -433,10 +574,11 @@ function LocationsMap({ company }: LocationsMapProps) {
 								))}
 						</FeatureGroup>
 
-						{/* Map click handler to deselect polygon */}
+						{/* Map Click Handler to Deselect Service Areas */}
 						<MapClickHandler onMapClick={() => setSelectedServiceArea(null)} />
 					</MapContainer>
 
+					{/* Service Area Details Card */}
 					{selectedServiceArea && mode !== "editServiceArea" && (
 						<Card className="absolute top-4 left-4 w-96 z-[1000]">
 							<CardHeader>
@@ -505,8 +647,19 @@ function LocationsMap({ company }: LocationsMapProps) {
 										</AlertDialogHeader>
 										<AlertDialogFooter>
 											<AlertDialogCancel>Cancel</AlertDialogCancel>
-											<AlertDialogAction onClick={handleDeleteServiceArea} className="bg-red-600 hover:bg-red-700">
-												Delete
+											<AlertDialogAction
+												onClick={handleDeleteServiceArea}
+												className="bg-red-600 hover:bg-red-700"
+												disabled={loading}
+											>
+												{loading ? (
+													<>
+														<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+														Deleting...
+													</>
+												) : (
+													"Yes, delete my company"
+												)}
 											</AlertDialogAction>
 										</AlertDialogFooter>
 									</AlertDialogContent>
@@ -516,7 +669,7 @@ function LocationsMap({ company }: LocationsMapProps) {
 					)}
 				</div>
 
-				{/* Side panel for editing */}
+				{/* Side Panel for Adding or Editing Service Areas */}
 				{mode && (
 					<div
 						className={`h-full bg-white p-6 shadow-lg rounded-lg transition-all duration-300 ${

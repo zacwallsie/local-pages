@@ -1,7 +1,7 @@
 import React from "react"
 import { Metadata } from "next"
 import app from "@/lib/app"
-import { getAuthenticatedUserAndCompany } from "@/lib/supabase/serverUtils"
+import { getAuthenticatedUserAndCompany } from "@/lib/supabase/client/serverUtils"
 import { ServicesDataTable } from "@/components/services/ServicesDataTable"
 
 export const metadata: Metadata = {
@@ -12,6 +12,10 @@ export const metadata: Metadata = {
 const ServicesPage = async () => {
 	// Fetch authenticated user and their company
 	const { user, company } = await getAuthenticatedUserAndCompany()
+
+	if (!user.email) {
+		return null
+	}
 
 	return (
 		<div className="container mx-auto py-10 mt-6">

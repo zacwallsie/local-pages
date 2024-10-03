@@ -10,8 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { ArrowUpCircle, Loader2 } from "lucide-react"
-import { updateCompanyAction } from "@/app/api/company"
-import { deleteCompanyAction } from "@/app/api/company"
+import { updateCompanyAction, deleteCompanyAction } from "@/lib/supabase/server/company"
 import { Separator } from "@/components/ui/separator"
 import { Company } from "@/types/supabase"
 import {
@@ -26,12 +25,24 @@ import {
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 
+/**
+ * Props for the UpdateCompanyForm component.
+ *
+ * @interface UpdateCompanyFormProps
+ * @property {Company} company - The company data to be updated.
+ * @property {() => void} [onCancel] - Optional callback to handle form cancellation.
+ * @property {() => void} [onSuccess] - Optional callback to handle successful form submission.
+ */
 interface UpdateCompanyFormProps {
 	company: Company
 	onCancel?: () => void
 	onSuccess?: () => void
 }
 
+/**
+ * Validation schema for the Update Company form using Yup.
+ * Ensures that required fields are filled and that the logo meets size and format requirements.
+ */
 const UpdateCompanySchema = Yup.object().shape({
 	company_name: Yup.string().required("Company Name is required"),
 	description: Yup.string().required("Description is required"),
@@ -50,13 +61,37 @@ const UpdateCompanySchema = Yup.object().shape({
 	address: Yup.string().nullable(),
 })
 
+/**
+ * Represents the result of the createCompanyAction.
+ * It can either contain an error message or indicate success.
+ *
+ * @type {CreateCompanyActionResult}
+ */
+type CreateCompanyActionResult = { error: string } | { success: true } | undefined
+
+/**
+ * UpdateCompanyForm Component
+ *
+ * Renders a form that allows users to update their company profile.
+ * Utilizes Formik for form state management and Yup for validation.
+ *
+ * @param {UpdateCompanyFormProps} props - The properties passed to the component.
+ * @param {Company} props.company - The company data to be updated.
+ * @param {() => void} [props.onCancel] - Optional callback to handle form cancellation.
+ * @param {() => void} [props.onSuccess] - Optional callback to handle successful form submission.
+ * @returns {JSX.Element} The rendered Update Company form.
+ */
 export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, onCancel, onSuccess }) => {
-	const { toast } = useToast()
+	const { toast } = useToast() // Hook for displaying toast notifications
 
+	// State to manage the image preview of the uploaded logo
 	const [imagePreview, setImagePreview] = useState<string | null>(company.logo || null)
-	const [loading, setLoading] = useState(false)
-	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+	const [loading, setLoading] = useState(false) // State to manage the loading indicator
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false) // State to manage the delete confirmation dialog
 
+	/**
+	 * Initialize Formik with initial values, validation schema, and submit handler.
+	 */
 	const formik = useFormik({
 		initialValues: {
 			company_name: company.company_name || "",
@@ -68,8 +103,9 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 		},
 		validationSchema: UpdateCompanySchema,
 		onSubmit: async (values, { setSubmitting }) => {
-			setLoading(true)
+			setLoading(true) // Show loading indicator
 			try {
+				// Create a FormData object and append form values
 				const formData = new FormData()
 				formData.append("company_name", values.company_name)
 				formData.append("description", values.description)
@@ -78,6 +114,7 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 				formData.append("phone_number", values.phone_number || "")
 				formData.append("address", values.address || "")
 
+				// Handle logo upload if a file is provided
 				if (values.logo instanceof File) {
 					const logoString = await new Promise<string>((resolve, reject) => {
 						const reader = new FileReader()
@@ -95,63 +132,80 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 					formData.append("logo", logoString)
 				}
 
-				const result = await updateCompanyAction(formData)
+				// Call the updateCompanyAction with the form data
+				const result = (await updateCompanyAction(formData)) as CreateCompanyActionResult
 
-				if ("error" in result) {
+				// Handle errors returned from updateCompanyAction
+				if (result && "error" in result) {
 					toast({
 						variant: "destructive",
 						title: "Company Update Failed",
 						description: result.error,
 					})
-				} else if ("success" in result) {
+				}
+				// Handle successful company update
+				else if (result && "success" in result) {
 					toast({
 						variant: "default",
 						title: "Company Updated",
-						description: result.message,
+						description: "Your company has been updated successfully",
 					})
-					onSuccess?.()
+					onSuccess?.() // Invoke the onSuccess callback if provided
 				}
 			} catch (error: any) {
+				// Handle unexpected errors during the company update process
 				toast({
 					variant: "destructive",
 					title: "Something Went Wrong",
 					description: error.message,
 				})
 			} finally {
-				setLoading(false)
-				setSubmitting(false)
+				setLoading(false) // Hide loading indicator
+				setSubmitting(false) // Re-enable the submit button
 			}
 		},
 	})
 
+	/**
+	 * Handle changes to the logo input field.
+	 * Updates the form state and sets the image preview.
+	 *
+	 * @param {React.ChangeEvent<HTMLInputElement>} e - The change event from the logo input field.
+	 */
 	const handleLogoChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const file = e.target.files?.[0]
 
 			if (file) {
-				formik.setFieldValue("logo", file)
+				formik.setFieldValue("logo", file) // Update Formik's state with the selected file
 
 				const reader = new FileReader()
 				reader.onload = (e) => {
 					const result = e.target?.result
 					if (typeof result === "string") {
-						setImagePreview(result)
+						setImagePreview(result) // Set the image preview
 					}
 				}
-				reader.readAsDataURL(file)
+				reader.readAsDataURL(file) // Read the file as a data URL for preview
 			} else {
-				formik.setFieldValue("logo", null)
-				setImagePreview(null)
+				formik.setFieldValue("logo", null) // Reset the logo field if no file is selected
+				setImagePreview(null) // Remove the image preview
 			}
 		},
 		[formik]
 	)
 
+	/**
+	 * Handle the deletion of the company account.
+	 * Shows a confirmation dialog before proceeding.
+	 */
 	const handleDeleteAccount = async () => {
-		setLoading(true)
+		setLoading(true) // Show loading indicator
 		try {
+			// Call the deleteCompanyAction to delete the company
 			const result = await deleteCompanyAction()
 
+			// Handle errors returned from deleteCompanyAction
 			if ("error" in result) {
 				toast({
 					variant: "destructive",
@@ -159,6 +213,7 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 					description: result.error,
 				})
 			} else {
+				// Handle successful company deletion
 				toast({
 					variant: "default",
 					title: "Company Deleted",
@@ -168,19 +223,21 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 				window.location.href = "/"
 			}
 		} catch (error: any) {
+			// Handle unexpected errors during the company deletion process
 			toast({
 				variant: "destructive",
 				title: "Something Went Wrong",
 				description: error.message,
 			})
 		} finally {
-			setLoading(false)
-			setIsDeleteDialogOpen(false)
+			setLoading(false) // Hide loading indicator
+			setIsDeleteDialogOpen(false) // Close the delete confirmation dialog
 		}
 	}
 
 	return (
 		<div className="w-full space-y-16">
+			{/* Update Company Form Card */}
 			<Card className="bg-aerial-white">
 				<CardHeader className="bg-aerial-blue-light">
 					<CardTitle className="text-2xl font-bold text-aerial-dark_blue-dark">Update Company</CardTitle>
@@ -188,10 +245,11 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 				</CardHeader>
 				<CardContent className="mt-4">
 					<form onSubmit={formik.handleSubmit} className="space-y-8">
-						{/* Required Information */}
+						{/* Company Information Section */}
 						<div className="space-y-6">
 							<h3 className="text-lg font-semibold text-aerial-blue-dark">Company Information</h3>
 							<div className="space-y-4">
+								{/* Company Name Field */}
 								<div>
 									<Label htmlFor="company_name" className="text-sm font-medium text-aerial-slate-dark">
 										Company Name
@@ -206,11 +264,13 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 										placeholder="Your Company Name"
 										className="mt-1 bg-aerial-white border-aerial-blue"
 									/>
+									{/* Display validation error for company_name */}
 									{formik.touched.company_name && formik.errors.company_name && (
 										<p className="mt-1 text-sm text-aerial-red">{formik.errors.company_name}</p>
 									)}
 								</div>
 
+								{/* Description Field */}
 								<div>
 									<Label htmlFor="description" className="text-sm font-medium text-aerial-slate-dark">
 										Description
@@ -224,6 +284,7 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 										placeholder="Company Description"
 										className="mt-1 h-24 bg-aerial-white border-aerial-blue"
 									/>
+									{/* Display validation error for description */}
 									{formik.touched.description && formik.errors.description && (
 										<p className="mt-1 text-sm text-aerial-red">{formik.errors.description}</p>
 									)}
@@ -233,10 +294,11 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 
 						<Separator className="my-8 h-0.5" />
 
-						{/* Optional Information */}
+						{/* Optional Information Section */}
 						<div className="space-y-6">
 							<h3 className="text-lg font-semibold text-aerial-blue-dark">Optional Information</h3>
 							<div className="space-y-4">
+								{/* Logo Upload Field */}
 								<div>
 									<Label htmlFor="logo" className="text-sm font-medium text-aerial-slate-dark">
 										Logo
@@ -266,6 +328,7 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 									</div>
 								</div>
 
+								{/* Website URL Field */}
 								<div>
 									<Label htmlFor="website_url" className="text-sm font-medium text-aerial-slate-dark">
 										Website URL
@@ -281,11 +344,13 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 										className="mt-1 bg-aerial-white border-aerial-blue"
 									/>
 									<p className="mt-1 text-sm text-aerial-slate">Enter your company's website address if available.</p>
+									{/* Display validation error for website_url */}
 									{formik.touched.website_url && formik.errors.website_url && (
 										<p className="mt-1 text-sm text-aerial-red">{formik.errors.website_url}</p>
 									)}
 								</div>
 
+								{/* Phone Number Field */}
 								<div>
 									<Label htmlFor="phone_number" className="text-sm font-medium text-aerial-slate-dark">
 										Phone Number
@@ -301,11 +366,13 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 										className="mt-1 bg-aerial-white border-aerial-blue"
 									/>
 									<p className="mt-1 text-sm text-aerial-slate">Provide a contact number for your company (if applicable).</p>
+									{/* Display validation error for phone_number */}
 									{formik.touched.phone_number && formik.errors.phone_number && (
 										<p className="mt-1 text-sm text-aerial-red">{formik.errors.phone_number}</p>
 									)}
 								</div>
 
+								{/* Address Field */}
 								<div>
 									<Label htmlFor="address" className="text-sm font-medium text-aerial-slate-dark">
 										Address
@@ -320,6 +387,7 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 										className="mt-1 h-24 bg-aerial-white border-aerial-blue"
 									/>
 									<p className="mt-1 text-sm text-aerial-slate">Enter your company's physical address (if applicable).</p>
+									{/* Display validation error for address */}
 									{formik.touched.address && formik.errors.address && (
 										<p className="mt-1 text-sm text-aerial-red">{formik.errors.address}</p>
 									)}
@@ -327,6 +395,7 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 							</div>
 						</div>
 
+						{/* Action Buttons */}
 						<div className="flex gap-2 justify-end">
 							{onCancel && (
 								<Button type="button" variant="destructive" onClick={onCancel}>
@@ -348,7 +417,7 @@ export const UpdateCompanyForm: React.FC<UpdateCompanyFormProps> = ({ company, o
 				</CardContent>
 			</Card>
 
-			{/* Danger Zone Card */}
+			{/* Danger Zone: Delete Company */}
 			<Card className="bg-aerial-red-lightest border-aerial-red">
 				<CardContent className="mt-4">
 					<div className="flex justify-between items-center">

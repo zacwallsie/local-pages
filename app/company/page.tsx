@@ -1,7 +1,7 @@
 // app/company/page.tsx
 
 import React from "react"
-import { getAuthenticatedUserAndCompany } from "@/lib/supabase/serverUtils"
+import { getAuthenticatedUserAndCompany } from "@/lib/supabase/client/serverUtils"
 import { CompanyDetails } from "@/components/company/CompanyDetails"
 
 /**

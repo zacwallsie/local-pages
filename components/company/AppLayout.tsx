@@ -7,7 +7,7 @@ import { HandPlatter, MapPinned, User, LucideIcon, Building2, LogOut } from "luc
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Logo from "../shared/Logo"
-import { signOutAction } from "@/app/api/auth"
+import { signOutAction } from "@/lib/supabase/server/auth"
 
 interface NavIconProps {
 	href: string

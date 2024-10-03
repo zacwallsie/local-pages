@@ -1,8 +1,9 @@
 "use server"
 
-import { createServerSupabaseClient } from "@/lib/supabase/serverClient"
-import { createService, updateService, deleteService, getServicesByCompanyId, Service } from "@/lib/supabase/service"
+import { createServerSupabaseClient } from "@/lib/supabase/client/serverClient"
+import { createService, updateService, deleteService, getServicesByCompanyId } from "@/lib/supabase/client/service"
 import { ServiceCategory, ServiceCategoryInternalName } from "@/types/supabase"
+import { Service } from "@/types/supabase"
 
 /**
  * ActionResult: A type representing the result of an action.
